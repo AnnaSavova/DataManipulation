@@ -1,0 +1,476 @@
+---
+title: "The Professor Effect"
+subtitle:  "Level2 Lab9 Homework Assignment" 
+author: "School of Psychology, University of Glasgow"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+## DO NOT DELETE THIS CHUNK OR ALTER ANY OF THE LINES WITHIN THIS CHUNK!
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+```
+
+# Reflection assignment
+
+This is the homework assignment for Level 2 Semester 1 Lab 9. Refer to the online Moodle page to see the questions. You should first save this file and replace the `GUID` part of the filename with your actual `GUID`, e.g. `9804672_Level2_Semester1_Lab9.Rmd`. You should then set your working directory to the folder containing this file and the datafile - remember both the .Rmd file and the datafiles need to be in the same folder. Now knit the code to test that there are currently no errors in the code. This is a good test that you can perform from time to time, and before you submit, to make sure that there are still no errors in your code. Obviously this doesn't mean that all your answers are correct; it just means that the code is error free.
+
+As in the previous assignments there are a number of code chunks already set up. Some of the code chunks may require entering just a number whilst other tasks may require entering code that you have practiced in the labs.  Follow the instructions of each task and pay close attention to what is asked. Do not change the names of any variables or dataframes given to you, and do not change the rules or names of any of the code chunks as this may impact your grade. If you are unsure which are the names, refer back to the lab activities. In this assignment the names are T01 to T11. Do not change these names. Nearly all the tasks will involve replacing NULLs with either a number or code relating to what we have previously covered in all the summative and formative labs to this point. Look back to see what you previously did.
+
+There are 11 tasks in total to attempt and answer. Should you require any assistance or help, keep in mind the practical skills sessions, student/office hours, the Moodle forums, and the slack forum group: channel **#level2_2019** @ <a href="https://rguppies.slack.com/" target = "_blank">rguppies.slack.com</a>.
+
+# The Professor Effect
+
+The purpose of this assignment is to show you how far you have developed across the semester in terms of skills, data analysis, interpretation and coding. As such we will perform tasks that stretch across the semester and you may need to refer back to a number of the lab activities from the semester to complete various parts of this assignment. You have the necessary codes to run the below assignment; you just have to think back to when you last did that task - it is what we do all the time!
+
+## Background
+The backdrop for the assignment is the following two studies:
+
+1. Dijksterhuis, A. & van Knippenberg, A. (1998). *The relation between perception and behavior, or how to win a game of trivial pursuit. Journal of Personality and Social Psychology, 74(4), 865-877.* <a href = "https://www.gla.ac.uk/myglasgow/library/" target = "_blank">Available through the University of Glasgow Library online resources</a>
+2. O'Donnell, M., Nelson, L., et al., (preprint - 2017) *Multilab direct replication of: A variant of study 4 from Dijksterhuis, A. & van Knippenberg, A. (1998). The relation between perception and behavior, or how to win a game of trivial pursuit. Journal of Personality and Social Psychology, 74(4), 865-877.* <a href = "https://www.psychologicalscience.org/redesign/wp-content/uploads/2017/11/RRR_ProfPrime_Ms_171013_ACPT.pdf" target = "_blank">Available in PDF format by clicking here</a>
+
+**SEE MOODLE FOR FURTHER DESCRIPTION OF THE STUDY**
+
+## Before starting let's check:
+
+1. The `Saunders_data_complete.csv` file and the `Shanks_data_complete.csv` file are saved into a folder on your computer and you have manually set this folder as your working directory. **Remember: do not set your working directory using code in the script**. Instead, manually set it using the `Session >> Set Working Directory` options. Also, **do not** at any time rename the .csv files. They should be named exactly as above for the duration of this activity. This is to ensure that your code will be reproducible when we assess it. We will only assess it against the above specifically named .csv files.
+
+2. The `.Rmd` file is saved in the same folder as the datafiles. For assessments we ask that you save the .Rmd file with the format `GUID_Level2_Semester1_Lab9.Rmd` where `GUID` is replaced with your `GUID`.
+
+3. Remember that if at any point you want to explore your data to become familiar with the variable names, noting any capital letters and full-stops, you can use `View()` or `glimpse()`. Type these functions only in the console window and not in the assignment Rmd file.
+
+# Let's Begin
+
+### Task 1: libraries and data
+As always, analysis starts with libraries and data. You will need `broom` and `tidyverse`. 
+
+* First, in the T01 code chunk below, add code to load in both of these libraries.
+* Secondly, replace the NULLs in the T01 code chunk below to load in the two data files using `read_csv()`. 
+
+Store the data from the Canadian `Saunders` lab in `dat_r` and from the UK `Shanks` lab in `dat_s`.
+ 
+```{r T01, message = FALSE, warning = FALSE}
+library(broom)
+library(tidyverse)
+
+dat_r <- read_csv("Saunders_data_complete.csv")
+dat_s <- read_csv("Shanks_data_complete.csv")
+```
+
+### Task 2: Wrangling 1
+Using the Saunders lab data set, `dat_r`, do the following three steps in **one pipeline**, replacing the NULL in the T02 code chunk below, and storing the output in the tibble called `dat_r_rdc`. 
+
+1. From the full data select, in this order, only the columns `prime_code`, `langauge`, `country` and `correct_pct`.
+2. Working with numeric conditions is tricky so add on a column called `condition` where 1 in `prime_code` is recoded as *professor* and 0 as *hooligan*. <a href="https://debruine.github.io/posts/recode/" target = "_blank">A little help on recoding from Prof Lisa DeBruine</a>
+3. Given the priming section was in English and the questions were in English, `language` may have had an influence that is not controlled for.  Filter the data to keep only those who have stated their first `language` as `English`. 
+
+Check your work: As a result of these steps you should have a tibble with 101 observations across 5 columns, matching the structure and column order shown on Moodle.
+
+```{r T02}
+dat_r_rdc <- filter(select(dat_r, `prime_code`,`language`,`country`,`correct_pct`), language == "English") %>%
+  mutate(condition = recode(prime_code,"1" = "professor", "0" = "hooligan"))
+```
+
+### Task 3: Wrangling 2
+And now the same for the Shanks data:
+
+* Replace the NULL in the T03 code chunk below to do the same three steps for the Shanks data set and store the output in the tibble called `dat_s_rdc`. Watch out however, they have entered people's first language as `English` or `english`. Keep both entries in your dataset. 
+
+Check your work: As a result of these steps you should have a tibble with 60 observations across 5 columns, matching the structure and column order shown on Moodle.
+
+```{r T03}
+dat_s_rdc <- filter(select(dat_s, `prime_code`,`language`,`country`,`correct_pct`), language == "english" | language == "English") %>%
+  mutate(condition = recode(prime_code,"1" = "professor", "0" = "hooligan"))
+```
+
+### Task 4: Combine the datasets
+Replace the NULL in the T04 code chunk below with **one pipeline** to:
+
+1. bind the two datasets (`dat_r_rdc` and `dat_s_rdc`) together and then
+2. select only the columns, `condition`, `country` and `correct_pct`. Again, select the columns in the order stated. 
+
+Store the ouput of these two steps in the tibble `combined`. As a result of this step you should have 161 observations across 3 columns in the order stated above.
+
+```{r T04}
+combined <- rbind(dat_r_rdc,dat_s_rdc) %>%
+  select(`condition`,`country`,`correct_pct`)
+```
+
+### Task 5: Visualising our assumptions
+Before running any analysis you should always be in the habit of checking assumptions such as variance, normality, etc. One great way of doing this (as you know) is through generating informative plots. 
+
+* In the T05 code chunk below, add code so that when knitted the figure produced closely replicates this figure shown on Moodle. Pay attention to elements such as color, the width of the boxplot and data points, as well as any changes to labels, background and dimensions of axes.
+* Note that the position of individual dots does not have to match given the function that creates their position uses a random value.
+
+```{r T05}
+# plot the figure; it must show when knitted.
+
+combined %>%
+  ggplot(aes(x=condition, y=correct_pct, fill = condition)) +
+  facet_wrap(~country) +
+  geom_violin(height=1.5,width=0.9) +
+  geom_boxplot(fill = "white", height = 1, width = 0.4) +
+  geom_jitter(width = 0.1, shape = 16) + 
+  labs(x ="Experiment Condition", y ="Percentage Correct(%)") +
+  theme_bw() +
+  coord_cartesian(ylim=c(0,100),expand = FALSE) +
+  theme(legend.position = "none")
+```
+
+### Task 6: The descriptives
+Looking Good! Next, when writing up experiments we need to have a note of measures of spread (e.g. standard deviation) and central tendency (e.g. mean) for each condition, as well as how many people are in each condition. 
+
+* Using **one pipeline** replace the `NULL` in the T06 code chunk below to create the descriptives table shown on Moodle. Pay particular attention to the names and order of columns, and order of rows.  
+
+Store the output in the tibble called `descriptives`. Your table should match the structure of the table shown on Moodle but with your actual values replacing the question marks.
+
+```{r T06}
+descriptives <-  group_by(combined, country, condition) %>%
+  summarise(n = n(),mean = mean(correct_pct), sd = sd(correct_pct))
+```
+
+### Task 7: Canadian t-test
+Hmmm, so the data looks normally distributed but it looks like we have unequal samples and maybe that the distributions are not exactly equal in variance. 
+
+* Using your knowledge from previous readings, and in particular Lab 7, replace the NULL in the T07 code chunk with code to run the most appropriate t-test to compare **percentage correct** for those in the hooligan condition versus those in the professor condition from the **Canadian** lab group.
+* Store the output in the data_frame  called `ttest_canada` so that it matches the table shown on Moodle.
+
+**Note1:** Much of the information in the table has been deliberately hidden but your output table will state the actual values.
+
+**Note2:** The values in your table should match the one shown on Moodle in terms of order, value, and whether they are positive or negative. You have enough information shown on Moodle to know whether the tables match or not.
+
+```{r T07}
+ttest_canada <- t.test(filter(combined,country =="Canada")%>% filter(condition == "hooligan") %>% pull(correct_pct),
+                       filter(combined,country =="Canada")%>% filter(condition == "professor") %>% pull(correct_pct)) %>%
+  tidy()
+```
+
+### Task 8: United Kingdom t-test
+We now need to run the test for the United Kingdom lab. As in the Canadian data, the UK data, though normal looking, has unequal samples and the variance is even less even. 
+
+* Using your knowledge from previous readings, replace the NULL in the T08 code chunk with code to run the most appropriate t-test to compare **'percentage correct'** for those in the professor condition versus those in the hooligan condition from the **UK** lab group.
+* Store the output in the data_frame  called `ttest_ucl` so that it matches the table shown on Moodle. 
+
+**Note1:** Much of the information in the table has been deliberately hidden but your output table will state it.
+
+**Note2:** The values in your table should match the one shown on Moodle in terms of order, value, and whether they are positive or negative. You have enough information shown on Moodle to know whether the tables match or not.
+
+```{r T08}
+ttest_ucl <- t.test(filter(combined,country =="United Kingdom")%>% filter(condition == "professor") %>% pull(correct_pct),
+                       filter(combined,country =="United Kingdom")%>% filter(condition == "hooligan") %>% pull(correct_pct)) %>%
+  tidy()
+```
+
+### Task 9: Combining results and effect sizes
+Having results in different tables is messy; let's bring the results together and add some effect sizes.
+
+* Replace the NULL in the T09 code chunk below, storing the output in `results`, with **a pipeline of code** that replicates the table shown on Moodle. The following three steps will help.
+
+1. Bind together the two tables, showing the t-test results, created in Tasks 7 and 8.
+2. Add one column called `cohens` which calculates the cohen's d effect size for each t-test, and another column called `lab` that labels each row with the surname of the lab the data came from. 
+3. Select only the appropriate columns in the order shown on Moodle.
+
+**Note1:** Use the appropriate cohen's d formula from the Lab 8 activities.
+
+**Note2:** Your solution should exactly match the structure of the table shown on Moodle but with your values replacing the question marks.
+
+```{r T09}
+results <- bind_rows("Saunders" = ttest_canada, "Shanks" = ttest_ucl, .id = "lab") %>%
+  mutate(cohens=(2*statistic)/sqrt(parameter)) %>%
+  select(lab, parameter, statistic, p.value, cohens)
+```
+
+### Task 10: Power of Professors
+Replace the NULLs in the T10 code chunk below with code to calculate what would be the minimum effect sizes that the two labs could have detected (as opposed to what they did detect).
+
+* Calculate an effect size for both countries, storing the Canadian output in `min_cohens_can` and the UK output in `min_cohens_uk`.
+* Use the power.t.test() function and assume "two.sided" tests at power = .8, alpha = .05, sd = 1, and, in the interests of being conservative, use the smallest n for that country.
+* Both effect sizes must be stored as single values and rounded to two decimal places
+
+```{r T10}
+min_cohens_can <- power.t.test(power = .8,
+                             delta = .5,
+                             sd = 1,
+                             sig.level = 0.05,
+                             type = "paired",
+                             alternative = "two.sided") %>% tidy() %>% pull(min(n)) %>% ceiling()
+
+min_cohens_uk <- power.t.test(power = .8,
+                             delta = .5,
+                             sd = 1,
+                             sig.level = 0.05,
+                             type = "paired",
+                             alternative = "two.sided") %>% tidy() %>% pull(min(n)) %>% ceiling()
+```                        
+
+### Task 11: The Final Interpretation
+
+Read through the below four statements. One of the sentences is a coherent summary consistent with the above analysis comparing Professors and Hooligans in the UK and Canada.
+
+* In the `T11` code chunk below, replace the `NULL` with the number of the statement below that best summarises the above analyses. Store this single value in `answer_t11`. All values have been rounded accordingly.
+
+1. A power analysis indicated that the minimum effect sizes that the two labs could detect were: Blair Lab, d = 0.59; Shanks Lab, d = 0.78. However, based on two separate between-subjects t-tests (Welch's method; no assumption regarding variance) it turned out that there was no significant difference in terms of priming between the Professor and Hooligan conditions in either the Blair Lab (t(94.19) = .97, p = .327) or the Shanks Lab (t(53.93) = 0.81, p = .423).  Thus the findings of the RRR by O'Donnell, M., Nelson, L., et al., (2017) are not consistent with the proposed Professor Priming Effect found by van Knippenberg and Dijksterhuis (1998).
+
+2. A power analysis indicated that the minimum effect sizes that the two labs could detect were: Blair Lab, d = 0.59; Shanks Lab, d = 0.78. However, based on two separate within-subjects t-tests (Welch's method; no assumption regarding variance) it turned out that there was no significant difference in terms of priming between the Professor and Hooligan conditions in either the Blair Lab (t(94.19) = .97, p = .327) or the Shanks Lab (t(53.93) = 0.81, p = .423).  Thus the findings of the RRR by O'Donnell, M., Nelson, L., et al., (2017) are not consistent with the proposed Professor Priming Effect found by Dijksterhuis and van Knippenberg (1998).
+
+3. A power analysis indicated that the minimum effect sizes that the two labs could detect were: Blair Lab, d = 0.59; Shanks Lab, d = 0.78. However, based on two separate between-subjects t-tests (Welch's method; no assumption regarding variance) it turned out that there was no significant difference in terms of priming between the Professor and Hooligan conditions in either the Blair Lab (t(94.19) = .97, p = .327) or the Shanks Lab (t(53.93) = 0.81, p = .423).  Thus the findings of the RRR by O'Donnell, M., Nelson, L., et al., (2017) are not consistent with the proposed Professor Priming Effect found by Dijksterhuis and van Knippenberg (1998).
+
+4. A power analysis indicated that the minimum effect sizes that the two labs could detect were: Blair Lab, d = 0.59; Shanks Lab, d = 0.78. However, based on two separate between-subjects t-tests (Student's method; no assumption regarding variance) it turned out that there was no significant difference in terms of priming between the Professor and Hooligan conditions in either the Blair Lab (t(94.19) = .97, p = .327) or the Shanks Lab (t(53.93) = 0.81, p = .423).  Thus the findings of the RRR by O'Donnell, M., Nelson, L., et al., (2017) are not consistent with the proposed Professor Priming Effect found by Dijksterhuis and van Knippenberg (1998).
+
+```{r T11}
+answer_t11 <- 3
+```
+
+**Main Tasks Completed!**
+
+Information on how to submit your assignment is below this section. The following questions do not count towards your assignment and you are more than welcome to skip them if you do not wish to answer.
+
+# Feedback Questions
+
+**NOTE**: Half of the below feedback questions mimic the previous feedback questions to help you track your confidence in those areas as well as the new skills we have taught since that assignment! 
+
+Information on how to submit your assignment is below this section. The following questions do not count towards your assignment and you are more than welcome to skip them if you do not wish to answer. 
+
+As part of continuing course development and improvement we will ask a small number of short questions at the end of each assignment to allow us to track how the class in general is doing in regards the skills we are teaching in the labs. No student will ever be identified or named in this process and again there is no impact on your assignment grade if you choose not to answer.
+
+The data we gain from these questions will allow us to see which parts the class feel confident and competent on and which parts we could perhaps add additional learning materials to. Any presentation of this data at meetings, conferences, or in publication, will be presented as group data and again no student will be identifiable. If you wish not to answer any of the questions, please leave the code chunks as they are and scroll down to the Finished section on how to submit your assignment.
+
+## Feedback Question 1 - Overall on APES: Alpha, Power, Effect Sizes, and Sample Sizes.
+
+Please select the most appropriate answer for yourself. Overall I found the practical teaching on APES in lab 8 to be:
+
+1. Not challenging enough and would like more tests
+2. Challenging and/or at about the right level and I coped fine.
+3. Challenging and I found it quite hard to complete
+4. Too challenging and beyond my skills
+
+Select the appropriate option (e.g. number 1, 2, 3, or 4) and enter that number in the code chunk below, replacing the NULL, and storing that single value (i.e. the answer) as `feedback_q1`. Type just the number; no quotes. Alternatively, leave the NULL in place if you would prefer not to answer. 
+
+```{r feedback_q1}
+feedback_q1 <- NULL
+```
+
+## Feedback Question 2 - Competence on APES: Alpha, Power, Effect Sizes, and Sample Sizes.
+
+On a scale from 1 to 7, please rate how competent you now feel in using the APES skills taught in lab 8. By this we mean actually running a power analysis to determine effect size or sample size
+
+* 1 on the scale would indicate Not At All Competent 
+* 7 would indicate Extremely Competent.
+
+Select an appropriate value for yourself (e.g. number 1, 2, 3, 4, 5, 6, or 7) and enter that number in the code chunk below, replacing the NULL, and storing that single value (i.e. the answer) as `feedback_q2`. Type just the number; use only whole numbers, no decimal places; no quotes. Alternatively, leave the NULL in place if you would prefer not to answer. 
+
+```{r feedback_q2}
+feedback_q2 <- NULL
+```
+
+## Feedback Question 3 - Confidence on APES: Alpha, Power, Effect Sizes, and Sample Sizes.
+
+On a scale from 1 to 7, please rate how confident you now feel in using the APES skills taught in lab 8. By this we mean actually running a power analysis to determine effect size or sample size
+
+* 1 on the scale would indicate Not At All Confident 
+* 7 would indicate Extremely Confident
+
+Select an appropriate value for yourself (e.g. number 1, 2, 3, 4, 5, 6, or 7) and enter that number in the code chunk below, replacing the NULL, and storing that single value (i.e. the answer) as `feedback_q3`. Type just the number; use only whole numbers, no decimal places; no quotes. Alternatively, leave the NULL in place if you would prefer not to answer. 
+
+```{r feedback_q3}
+feedback_q3 <- NULL
+```
+
+## Feedback Question 4 - Attempted Formative APES Assignment (lab 8)
+
+Please select the most appropriate answer for yourself. In terms of the Lab 8 Formative APES Assignment: 
+
+* 1 - I attempted the Formative APES Assignment for Lab 8
+* 2 - I did not attempt the Formative APES Assignment for Lab 8
+
+Select the appropriate option (e.g. number 1, or 2) and enter that number in the code chunk below, replacing the NULL, and storing that single value (i.e. the answer) as `feedback_q4`. Type just the number; no quotes. Alternatively, leave the NULL in place if you would prefer not to answer.
+
+```{r feedback_q4}
+feedback_q4 <- NULL
+```
+
+## Feedback Question 5 - Competence on t-tests
+
+On a scale from 1 to 7, please rate how competent you now feel in using the t-tests skills taught in lab 6 and 7. By this we mean actually running a t-test - not datawrangling or visualisation.
+
+* 1 on the scale would indicate Not At All Competent 
+* 7 would indicate Extremely Competent.
+
+Select an appropriate value for yourself (e.g. number 1, 2, 3, 4, 5, 6, or 7) and enter that number in the code chunk below, replacing the NULL, and storing that single value (i.e. the answer) as `feedback_q5`. Type just the number; use only whole numbers, no decimal places; no quotes. Alternatively, leave the NULL in place if you would prefer not to answer. 
+
+```{r feedback_q5}
+feedback_q5 <- NULL
+```
+
+## Feedback Question 6 - Confidence on t-tests
+
+On a scale from 1 to 7, please rate how confident you now feel in using the t-test skills taught in lab 6 and 7. By this we mean actually running a t-test - not datawrangling or visualisation.
+
+* 1 on the scale would indicate Not At All Confident 
+* 7 would indicate Extremely Confident
+
+Select an appropriate value for yourself (e.g. number 1, 2, 3, 4, 5, 6, or 7) and enter that number in the code chunk below, replacing the NULL, and storing that single value (i.e. the answer) as `feedback_q6`. Type just the number; use only whole numbers, no decimal places; no quotes. Alternatively, leave the NULL in place if you would prefer not to answer. 
+
+```{r feedback_q6}
+feedback_q6 <- NULL
+```
+
+## Feedback Question 7 - Competence on Datawrangling
+
+On a scale from 1 to 7, please rate how confident you now feel in using the DataWrangling skills taught in lab 2. 
+
+* 1 on the scale would indicate Not At All Competent 
+* 7 would indicate Extremely Competent.
+
+Select an appropriate value for yourself (e.g. number 1, 2, 3, 4, 5, 6, or 7) and enter that number in the code chunk below, replacing the NULL, and storing that single value (i.e. the answer) as `feedback_q7`. Type just the number; use only whole numbers, no decimal places; no quotes. Alternatively, leave the NULL in place if you would prefer not to answer. 
+
+```{r feedback_q7}
+feedback_q7 <- NULL
+```
+
+## Feedback Question 8 - Confidence on DataWrangling
+
+On a scale from 1 to 7, please rate how confident you now feel in using the DataWrangling skills taught in lab 2.  
+
+* 1 on the scale would indicate Not At All Confident 
+* 7 would indicate Extremely Confident
+
+Select an appropriate value for yourself (e.g. number 1, 2, 3, 4, 5, 6, or 7) and enter that number in the code chunk below, replacing the NULL, and storing that single value (i.e. the answer) as `feedback_q8`. Type just the number; use only whole numbers, no decimal places; no quotes. Alternatively, leave the NULL in place if you would prefer not to answer. 
+
+```{r feedback_q8}
+feedback_q8 <- NULL
+```
+
+## Feedback Question 9 - Competence on Visualisation
+
+On a scale from 1 to 7, please rate how competent you now feel in using the Visualisation skills taught in lab 3. 
+
+* 1 on the scale would indicate Not At All Competent 
+* 7 would indicate Extremely Competent.
+
+Select an appropriate value for yourself (e.g. number 1, 2, 3, 4, 5, 6, or 7) and enter that number in the code chunk below, replacing the NULL, and storing that single value (i.e. the answer) as `feedback_q9`. Type just the number; use only whole numbers, no decimal places; no quotes. Alternatively, leave the NULL in place if you would prefer not to answer. 
+
+```{r feedback_q9}
+feedback_q9 <- NULL
+```
+
+## Feedback Question 10 - Confidence on Visualisation
+
+On a scale from 1 to 7, please rate how confident you now feel in using the Visualisation skills taught in lab 3.  
+
+* 1 on the scale would indicate Not At All Confident 
+* 7 would indicate Extremely Confident
+
+Select an appropriate value for yourself (e.g. number 1, 2, 3, 4, 5, 6, or 7) and enter that number in the code chunk below, replacing the NULL, and storing that single value (i.e. the answer) as `feedback_q10`. Type just the number; use only whole numbers, no decimal places; no quotes. Alternatively, leave the NULL in place if you would prefer not to answer. 
+
+```{r feedback_q10}
+feedback_q10 <- NULL
+```
+
+## Feedback Question 11 - Competence on Probability
+
+On a scale from 1 to 7, please rate how competent you now feel in using the Probability skills taught in lab 4. 
+
+* 1 on the scale would indicate Not At All Competent 
+* 7 would indicate Extremely Competent.
+
+Select an appropriate value for yourself (e.g. number 1, 2, 3, 4, 5, 6, or 7) and enter that number in the code chunk below, replacing the NULL, and storing that single value (i.e. the answer) as `feedback_q11`. Type just the number; use only whole numbers, no decimal places; no quotes. Alternatively, leave the NULL in place if you would prefer not to answer. 
+
+```{r feedback_q11}
+feedback_q11 <- NULL
+```
+
+## Feedback Question 12 - Confidence on Probability
+
+On a scale from 1 to 7, please rate how confident you now feel in using the Probability skills taught in lab 2.  
+
+* 1 on the scale would indicate Not At All Confident 
+* 7 would indicate Extremely Confident
+
+Select an appropriate value for yourself (e.g. number 1, 2, 3, 4, 5, 6, or 7) and enter that number in the code chunk below, replacing the NULL, and storing that single value (i.e. the answer) as `feedback_q12`. Type just the number; use only whole numbers, no decimal places; no quotes. Alternatively, leave the NULL in place if you would prefer not to answer. 
+
+```{r feedback_q12}
+feedback_q12 <- NULL
+```
+
+## Feedback Question 13 - Competence on Permutation Skills
+
+On a scale from 1 to 7, please rate how competent you now feel in using the Permutation skills taught in lab 5 and lab 6 preclass. 
+
+* 1 on the scale would indicate Not At All Competent 
+* 7 would indicate Extremely Competent.
+
+Select an appropriate value for yourself (e.g. number 1, 2, 3, 4, 5, 6, or 7) and enter that number in the code chunk below, replacing the NULL, and storing that single value (i.e. the answer) as `feedback_q13`. Type just the number; use only whole numbers, no decimal places; no quotes. Alternatively, leave the NULL in place if you would prefer not to answer. 
+
+```{r feedback_q13}
+feedback_q13 <- NULL
+```
+
+## Feedback Question 14 - Confidence on Permutation Skills
+
+On a scale from 1 to 7, please rate how confident you now feel in using the Permutation skills taught in lab 5 and lab 6 preclass.  
+
+* 1 on the scale would indicate Not At All Confident 
+* 7 would indicate Extremely Confident
+
+Select an appropriate value for yourself (e.g. number 1, 2, 3, 4, 5, 6, or 7) and enter that number in the code chunk below, replacing the NULL, and storing that single value (i.e. the answer) as `feedback_q14`. Type just the number; use only whole numbers, no decimal places; no quotes. Alternatively, leave the NULL in place if you would prefer not to answer. 
+
+```{r feedback_q14}
+feedback_q14 <- NULL
+```
+
+## Feedback Question 15 - Attempted Formative t-test Assignment (lab 6)
+
+Please select the most appropriate answer for yourself. In terms of the Lab 6 Formative t-test Assignment: 
+
+* 1 - I attempted the Formative t-test Assignment for Lab 6
+* 2 - I did not attempt the Formative t-test Assignment for Lab 6
+
+We are asking this question again as we are interested if people who did not do it originally have since been encouraged to do it.  If you did it originally your choice won't change. If you have completed it since the last time we asked, your choice will change. If you have never attempted it, your choice won't change.
+
+Select the appropriate option (e.g. number 1, or 2) and enter that number in the code chunk below, replacing the NULL, and storing that single value (i.e. the answer) as `feedback_q15`. Type just the number; no quotes. Alternatively, leave the NULL in place if you would prefer not to answer.
+
+```{r feedback_q15}
+feedback_q15 <- NULL
+```
+
+## Feedback Question 16 - Attempted Formative Probability Assignment
+
+Please select the most appropriate answer for yourself. In terms of the Lab 4 Formative Probability Assignment: 
+
+* 1 - I attempted the Formative Probability Assignment for Lab 4
+* 2 - I did not attempt the Formative Probability Assignment for Lab 4
+
+We are asking this question again as we are interested if people who did not do it originally have since been encouraged to do it.  If you did it originally your choice won't change. If you have completed it since the last time we asked, your choice will change. If you have never attempted it, your choice won't change.
+
+Select the appropriate option (e.g. number 1, or 2) and enter that number in the code chunk below, replacing the NULL, and storing that single value (i.e. the answer) as `feedback_q16`. Type just the number; no quotes. Alternatively, leave the NULL in place if you would prefer not to answer.
+
+```{r feedback_q16}
+feedback_q16 <- NULL
+```
+
+## Feedback Question 17 - Attempted Formative DataWrangling Assignment
+
+Finally, please select the most appropriate answer for yourself. In terms of the Lab 2 DataWrangling Assignment: 
+
+* 1 - I attempted the Formative DataWrangling Assignment for Lab 2
+* 2 - I did not attempt the Formative DataWrangling Assignment for Lab 2
+
+We are asking this question again as we are interested if people who did not do it originally have since been encouraged to do it.  If you did it originally your choice won't change. If you have completed it since the last time we asked, your choice will change. If you have never attempted it, your choice won't change.
+
+Select the appropriate option (e.g. number 1, or 2) and enter that number in the code chunk below, replacing the NULL, and storing that single value (i.e. the answer) as `feedback_q17`. Type just the number; no quotes. Alternatively, leave the NULL in place if you would prefer not to answer.
+
+```{r feedback_q17}
+feedback_q17 <- NULL
+```
+
+**Job Done**
+
+Well done, you are finished. Remember to submit your assignment through Moodle, in the format of `GUID_Level2_Semester1_Lab9.Rmd`, no later than 1 minute prior to the start of your next lab (i.e. if your lab starts at 13:00 then you must submit by 12:59). There is no lab next week but you must still submit the assignment next week or it will be considered as late.
+
+**Make sure that before you submit that you make sure that:**
+
+1. All the code chunks are named as they were in the original file, T01 to T11.
+2. That all variables, columns etc are named as they were originally asked to be named. Check spelling, e.g. `UK` is not the same as `uK`. Be reproducible!
+3. That you are submitting the file as an .Rmd file and nothing else.
+4. That the file you want to submit is the file you are about to submit as we can not return files for a second chance of submission.
+
